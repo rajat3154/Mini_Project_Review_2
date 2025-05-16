@@ -8,6 +8,7 @@ import {
   RECRUITER_API_END_POINT,
   STUDENT_API_END_POINT,
 } from "@/utils/constant";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Admin = () => {
   const [students, setStudents] = useState([]);
@@ -237,13 +238,10 @@ const Admin = () => {
       return;
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/v1/students/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${STUDENT_API_END_POINT}/students/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       const data = await response.json();
 
@@ -259,13 +257,14 @@ const Admin = () => {
       toast.error(error.message || "Failed to delete student");
     }
   };
+
   const handleDeleteRecruiter = async (id) => {
     if (!window.confirm("Are you sure you want to delete this Recruiter?"))
       return;
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/recruiter/${id}`,
+        `${RECRUITER_API_END_POINT}/recruiters/${id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -282,9 +281,17 @@ const Admin = () => {
       setRecruiters((prev) => prev.filter((s) => s._id !== id));
       toast.success(data.message || "Recruiter deleted successfully");
     } catch (error) {
-      console.error("Error deleting student:", error);
+      console.error("Error deleting recruiter:", error);
       toast.error(error.message || "Failed to delete Recruiter");
     }
+  };
+
+  const getInitials = (name) => {
+    return name
+      ?.split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
@@ -338,6 +345,9 @@ const Admin = () => {
                   <thead className="bg-gray-800 sticky top-0">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        Profile
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                         Name
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -361,6 +371,18 @@ const Admin = () => {
                     {currentStudents.length > 0 ? (
                       currentStudents.map((student) => (
                         <tr key={student._id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Avatar>
+                              <AvatarImage
+                                src={student?.profile?.profilePhoto}
+                                alt={student.fullname}
+                                className="h-10 w-10 rounded-full"
+                              />
+                              <AvatarFallback>
+                                {getInitials(student.fullname)}
+                              </AvatarFallback>
+                            </Avatar>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {student.fullname}
                           </td>
@@ -399,7 +421,7 @@ const Admin = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5" className="px-6 py-4 text-center">
+                        <td colSpan="7" className="px-6 py-4 text-center">
                           {students.length === 0
                             ? "No students found"
                             : "No matching students found"}
@@ -530,10 +552,10 @@ const Admin = () => {
                             <span
                               className={`px-2 py-1 rounded text-xs ${
                                 rec.companystatus === "Approved"
-                                  ? "bg-red-500"
+                                  ? "bg-green-500"
                                   : rec.companystatus === "Pending"
                                   ? "bg-yellow-500"
-                                  : "bg-green-500"
+                                  : "bg-red-500"
                               }`}
                             >
                               {rec.companystatus}
@@ -541,9 +563,7 @@ const Admin = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <button
-                              onClick={() =>
-                                handleDeleteRecruiter(rec._id)
-                              }
+                              onClick={() => handleDeleteRecruiter(rec._id)}
                               className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded"
                             >
                               Delete
@@ -615,22 +635,53 @@ const Admin = () => {
           ) : recruiterRequests.length > 0 ? (
             recruiterRequests.map((req) => (
               <div key={req._id} className="bg-gray-800 p-4 rounded-lg mb-4">
-                <p>
-                  <strong>Company:</strong> {req.companyname}
-                </p>
-                <p>
-                  <strong>Email:</strong> {req.email}
-                </p>
-                <p>
-                  <strong>CIN:</strong> {req.cinnumber}
-                </p>
-                <p>
-                  <strong>Address:</strong> {req.companyaddress}
-                </p>
-                <p>
-                  <strong>Status:</strong> {req.companystatus}
-                </p>
-                <div className="mt-2 flex gap-2">
+                <div className="flex items-center gap-4 mb-3">
+                  <Avatar>
+                    <AvatarImage
+                      src={req?.profilePhoto}
+                      alt={req.companyname}
+                      className="h-12 w-12 rounded-full"
+                    />
+                    <AvatarFallback>
+                      {getInitials(req.companyname)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-bold text-lg">{req.companyname}</h3>
+                    <p className="text-gray-400">{req.email}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p>
+                      <strong>CIN:</strong> {req.cinnumber}
+                    </p>
+                    <p>
+                      <strong>Address:</strong> {req.companyaddress}
+                    </p>
+                  </div>
+                  <div>
+                    <p>
+                      <strong>Status:</strong>{" "}
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          req.companystatus === "Approved"
+                            ? "bg-green-500"
+                            : req.companystatus === "Pending"
+                            ? "bg-yellow-500"
+                            : "bg-red-500"
+                        }`}
+                      >
+                        {req.companystatus}
+                      </span>
+                    </p>
+                    <p>
+                      <strong>Request Date:</strong>{" "}
+                      {new Date(req.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-2">
                   <button
                     onClick={() => handleApprove(req._id)}
                     className="bg-green-500 hover:bg-green-600 px-4 py-1 rounded transition-colors"

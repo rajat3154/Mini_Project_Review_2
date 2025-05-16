@@ -9,7 +9,6 @@ import { USER_API_END_POINT } from "@/utils/constant";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { setUser } from "@/redux/authSlice";
-import profilePic from "../assets/a.jpg";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
@@ -96,7 +95,6 @@ const Navbar = () => {
                     Internships
                   </Link>
                 </li>
-                
               </>
             )}
           </ul>
@@ -123,7 +121,7 @@ const Navbar = () => {
                 <div>
                   <Avatar className="w-8 h-8 rounded-full cursor-pointer border border-gray-500">
                     <AvatarImage
-                      src={profilePic}
+                      src={user?.profile?.profilePhoto}
                       alt="Profile Picture"
                     />
                     <AvatarFallback>
@@ -145,7 +143,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="w-10 h-10 rounded-full border border-gray-500">
                     <AvatarImage
-                      src={profilePic}
+                      src={user?.profile?.profilePhoto}
                       alt="Profile Picture"
                     />
                     <AvatarFallback>
@@ -158,7 +156,7 @@ const Navbar = () => {
                   </Avatar>
                   <div className="max-w-xs overflow-hidden">
                     <h4 className="font-medium text-lg text-white">
-                      John Doe
+                      {user?.fullname}
                     </h4>
                     <p className="text-sm text-gray-400">
                       {user?.profile?.bio}
