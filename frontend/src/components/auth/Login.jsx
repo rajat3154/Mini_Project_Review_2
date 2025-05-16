@@ -27,26 +27,9 @@ const Login = () => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
+ 
   const submitHandler = async (e) => {
     e.preventDefault();
-
-    // Default Admin Credentials Check
-    if (
-      input.email === "admin@gmail.com" &&
-      input.password === "admin" &&
-      input.role === "admin"
-    ) {
-      const adminUser = {
-        _id: "admin_default_id",
-        email: "admin@gmail.com",
-        role: "admin",
-        fullname: "Admin",
-      };
-      dispatch(setUser(adminUser));
-      toast.success("Welcome Admin");
-      navigate("/admin");
-      return;
-    }
 
     if (!input.role) {
       toast.error("Please select a role");
@@ -55,15 +38,21 @@ const Login = () => {
 
     try {
       dispatch(setLoading(true));
+
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: {
           "Content-Type": "application/json",
         },
         withCredentials: true,
       });
+
       if (res.data.success) {
         dispatch(setUser(res.data.user));
-        navigate("/");
+        if (input.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -73,7 +62,7 @@ const Login = () => {
       dispatch(setLoading(false));
     }
   };
-
+  
   return (
     <>
       <Navbar />

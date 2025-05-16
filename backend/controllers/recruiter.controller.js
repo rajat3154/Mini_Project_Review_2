@@ -69,3 +69,27 @@ export const getAllRecruiters = async (req, res) => {
             });
       }
 };
+
+export const deleteRecruiter = async (req, res) => {
+      try {
+            const recruiterId = req.params.id;
+
+            // Optional: Only admin can delete, check if user is admin
+            if (req.user.role !== "admin") {
+                  return res.status(403).json({ message: "Access denied. Admins only." });
+            }
+
+            const deletedRecruiter = await Recruiter.findByIdAndDelete(recruiterId);
+
+            if (!deletedRecruiter) {
+                  return res.status(404).json({ message: "Recruiter not found." });
+            }
+
+            res.status(200).json({ message: "Recruiter deleted successfully." });
+      } catch (error) {
+            console.error("Error deleting recruiter:", error);
+            res.status(500).json({ message: "Server error while deleting recruiter." });
+      }
+};
+
+

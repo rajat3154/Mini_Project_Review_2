@@ -6,48 +6,75 @@ import { Button } from "./ui/button";
 import { Contact, Mail, Pen } from "lucide-react";
 import { Badge } from "./ui/badge";
 import AppliedJobTable from "./AppliedJobTable";
-import AppliedInternships from "./AppliedInternships"; // Static AppliedInternships component
+import AppliedInternships from "./AppliedInternships";
 import UpdateProfileDialog from "./UpdateProfileDialog";
-import profilePic from "./assets/a.jpg";
+import { useSelector } from "react-redux";
+
 const Profile = () => {
   const [open, setOpen] = useState(false);
+  const { user } = useSelector((store) => store.auth);
 
-  // Static user data
-  const user = {
-    fullname: "John Doe",
-    email: "john.doe@example.com",
-    phonenumber: "+1234567890",
-    profile: {
-      profilePhoto: profilePic,
-      bio: "Software engineer passionate about building web applications.",
-      skills: ["JavaScript", "React", "Node.js", "CSS"],
-      resume: "https://example.com/resume.pdf",
-      resumeOriginalName: "JohnDoe_Resume.pdf",
-    },
-  };
-
-  // Mock Data for Static Applied Jobs and Internships
+  // Static Applied Jobs Data
   const appliedJobs = [
     {
-      title: "Frontend Developer",
-      company: "Tech Corp",
-      appliedDate: "2025-05-01",
+      _id: "1",
+      createdAt: "2025-05-01T12:00:00Z",
+      job: {
+        title: "Frontend Developer",
+        created_by: {
+          companyname: "Tech Corp",
+        },
+      },
+      status: "pending",
     },
     {
-      title: "Backend Developer",
-      company: "InnovateX",
-      appliedDate: "2025-04-20",
+      _id: "2",
+      createdAt: "2025-04-20T12:00:00Z",
+      job: {
+        title: "Backend Developer",
+        created_by: {
+          companyname: "InnovateX",
+        },
+      },
+      status: "accepted",
+    },
+    {
+      _id: "3",
+      createdAt: "2025-05-10T12:00:00Z",
+      job: {
+        title: "Full Stack Engineer",
+        created_by: {
+          companyname: "NextGen Solutions",
+        },
+      },
+      status: "rejected",
     },
   ];
+  
+  
 
+  // Static Applied Internships Data
   const appliedInternships = [
     {
       title: "Data Science Intern",
       company: "DataWorks",
       appliedDate: "2025-04-15",
+      status: "pending",
     },
-    { title: "UX/UI Intern", company: "DesignPro", appliedDate: "2025-04-10" },
+    {
+      title: "UX/UI Intern",
+      company: "DesignPro",
+      appliedDate: "2025-04-10",
+      status: "accepted",
+    },
+    {
+      title: "Marketing Intern",
+      company: "Brandify",
+      appliedDate: "2025-05-05",
+      status: "pending",
+    },
   ];
+  
 
   return (
     <div className="min-h-screen bg-black p-4">
@@ -68,7 +95,9 @@ const Profile = () => {
               <h1 className="font-semibold text-2xl text-blue-400">
                 {user?.fullname}
               </h1>
-              <p className="text-white">{user?.profile?.bio}</p>
+              <p className="text-white">
+                {user?.profile?.bio || "No bio available"}
+              </p>
             </div>
           </div>
 
@@ -91,7 +120,9 @@ const Profile = () => {
           </div>
           <div className="flex items-center gap-3">
             <Contact className="text-green-400" />
-            <span>{user?.phonenumber || user?.phoneNumber}</span>
+            <span>
+              {user?.phonenumber || user?.phoneNumber || "Not provided"}
+            </span>
           </div>
         </div>
 
@@ -106,7 +137,7 @@ const Profile = () => {
                 </Badge>
               ))
             ) : (
-              <span className="text-gray-500">NA</span>
+              <span className="text-gray-500">No skills added</span>
             )}
           </div>
         </div>
@@ -124,7 +155,7 @@ const Profile = () => {
               {user.profile.resumeOriginalName || "View Resume"}
             </a>
           ) : (
-            <span className="text-gray-500">NA</span>
+            <span className="text-gray-500">No resume uploaded</span>
           )}
         </div>
       </div>
@@ -140,7 +171,7 @@ const Profile = () => {
             <AppliedJobTable jobs={appliedJobs} />
           ) : (
             <p className="text-gray-400">
-              You haven’t applied to any jobs yet.
+              You haven't applied to any jobs yet.
             </p>
           )}
         </div>
@@ -154,7 +185,7 @@ const Profile = () => {
             <AppliedInternships internships={appliedInternships} />
           ) : (
             <p className="text-gray-400">
-              You haven’t applied to any internships yet.
+              You haven't applied to any internships yet.
             </p>
           )}
         </div>
