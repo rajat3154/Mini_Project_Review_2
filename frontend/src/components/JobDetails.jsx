@@ -27,8 +27,8 @@ const JobDetails = () => {
         status: "Pending",
         createdAt: new Date().toISOString(),
         applicant: {
-          fullname: "Rajat Kumar",
-          email: "rajat@example.com",
+          fullname: "Saurabh Salve",
+          email: "saurabhsalve@gmail.com",
           resume: "https://example.com/resume.pdf",
         },
       },
@@ -37,9 +37,9 @@ const JobDetails = () => {
         status: "Accepted",
         createdAt: new Date().toISOString(),
         applicant: {
-          fullname: "Aisha Roy",
-          email: "aisha@example.com",
-          resume: "",
+          fullname: "Aditi Somvanshi",
+          email: "aditisomvanshi100@gmail.com",
+          resume: "aditi_pdf",
         },
       },
     ],

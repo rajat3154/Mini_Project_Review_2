@@ -1,116 +1,67 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./shared/Navbar";
 import FilterCard from "./FilterCard";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setAllJobs } from "@/redux/jobSlice";
 import PostJob from "./recruiter/PostJob";
 
 const Jobs = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
-  const [filterJobs, setFilterJobs] = useState([
-    // Your job data here...
-    {
-      _id: "1",
-      title: "Frontend Developer",
-      company: { name: "Samsung", logo: "https://via.placeholder.com/50" },
-      location: "Bangalore, India",
-      description:
-        "Join our team to work on frontend applications using React.",
-      createdAt: new Date().toISOString(),
-      position: 5,
-      jobType: "Full-Time",
-      salary: "15",
-    },
-    {
-      _id: "2",
-      title: "Backend Developer",
-      company: { name: "Microsoft", logo: "https://via.placeholder.com/50" },
-      location: "Hyderabad, India",
-      description:
-        "Work with cutting-edge backend technologies to build scalable systems.",
-      createdAt: new Date().toISOString(),
-      position: 3,
-      jobType: "Part-Time",
-      salary: "12",
-    },
-    {
-      _id: "3",
-      title: "UI/UX Designer",
-      company: { name: "Google", logo: "https://via.placeholder.com/50" },
-      location: "Mumbai, India",
-      description:
-        "Design and create seamless user interfaces and experiences.",
-      createdAt: new Date().toISOString(),
-      position: 2,
-      jobType: "Full-Time",
-      salary: "10",
-    },
-    {
-      _id: "3",
-      title: "UI/UX Designer",
-      company: { name: "Google", logo: "https://via.placeholder.com/50" },
-      location: "Mumbai, India",
-      description:
-        "Design and create seamless user interfaces and experiences.",
-      createdAt: new Date().toISOString(),
-      position: 2,
-      jobType: "Full-Time",
-      salary: "10",
-    },
-    {
-      _id: "3",
-      title: "UI/UX Designer",
-      company: { name: "Google", logo: "https://via.placeholder.com/50" },
-      location: "Mumbai, India",
-      description:
-        "Design and create seamless user interfaces and experiences.",
-      createdAt: new Date().toISOString(),
-      position: 2,
-      jobType: "Full-Time",
-      salary: "10",
-    },
-    {
-      _id: "3",
-      title: "UI/UX Designer",
-      company: { name: "Google", logo: "https://via.placeholder.com/50" },
-      location: "Mumbai, India",
-      description:
-        "Design and create seamless user interfaces and experiences.",
-      createdAt: new Date().toISOString(),
-      position: 2,
-      jobType: "Full-Time",
-      salary: "10",
-    },
-    {
-      _id: "3",
-      title: "UI/UX Designer",
-      company: { name: "Google", logo: "https://via.placeholder.com/50" },
-      location: "Mumbai, India",
-      description:
-        "Design and create seamless user interfaces and experiences.",
-      createdAt: new Date().toISOString(),
-      position: 2,
-      jobType: "Full-Time",
-      salary: "10",
-    },
-    {
-      _id: "3",
-      title: "UI/UX Designer",
-      company: { name: "Google", logo: "https://via.placeholder.com/50" },
-      location: "Mumbai, India",
-      description:
-        "Design and create seamless user interfaces and experiences.",
-      createdAt: new Date().toISOString(),
-      position: 2,
-      jobType: "Full-Time",
-      salary: "10",
-    },
-  ]);
+  const { allJobs, searchedQuery } = useSelector((store) => store.job);
+  const [filterJobs, setFilterJobs] = useState(allJobs);
   const [showPostJob, setShowPostJob] = useState(false);
 
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/job/get", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch jobs");
+      }
+
+      if (data.success && Array.isArray(data.jobs)) {
+        dispatch(setAllJobs(data.jobs));
+      } else {
+        console.error("Invalid job data format");
+      }
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (searchedQuery) {
+      const filteredJobs = allJobs.filter((job) => {
+        return (
+          job.title.toLowerCase().includes(searchedQuery.toLowerCase()) ||
+          job.description.toLowerCase().includes(searchedQuery.toLowerCase()) ||
+          job.location.toLowerCase().includes(searchedQuery.toLowerCase())
+        );
+      });
+      setFilterJobs(filteredJobs);
+    } else {
+      setFilterJobs(allJobs || []);
+    }
+  }, [allJobs, searchedQuery]);
+
   const handleJobPosted = () => {
+    fetchJobs();
     setShowPostJob(false);
   };
 
@@ -193,7 +144,7 @@ const Jobs = () => {
                     />
                     <div>
                       <h1 className="font-semibold text-lg">
-                        {job.company?.name || "Company Name"}
+                        {job.company?.name || "Samsung"}
                       </h1>
                       <p className="text-sm text-gray-400">{job.location}</p>
                     </div>
@@ -220,9 +171,9 @@ const Jobs = () => {
                     <Button
                       onClick={() => {
                         if (user?.role === "student") {
-                          navigate(`/job/description/${job._id}`);
+                          navigate(`/job/description`);
                         } else if (user?.role === "recruiter") {
-                          navigate(`/job/details/${job._id}`);
+                          navigate(`/job/details`);
                         }
                       }}
                       variant="outline"
@@ -230,17 +181,9 @@ const Jobs = () => {
                     >
                       Details
                     </Button>
-
-                    {/* Display the appropriate button based on role */}
-                    {user?.role === "student" ? (
-                      <Button className="px-2 py-1 bg-[#7209b7] text-white text-sm font-bold rounded-md hover:bg-purple-900 cursor-pointer">
-                        Save for later
-                      </Button>
-                    ) : user?.role === "recruiter" ? (
-                      <Button className="px-2 py-1 bg-red-600 text-white text-sm font-bold rounded-md hover:bg-red-700 cursor-pointer">
-                        Delete
-                      </Button>
-                    ) : null}
+                    <Button className="px-2 py-1 bg-[#7209b7] text-white text-sm font-bold rounded-md hover:bg-purple-900 cursor-pointer">
+                      Save for later
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -251,5 +194,4 @@ const Jobs = () => {
     </div>
   );
 };
-
 export default Jobs;

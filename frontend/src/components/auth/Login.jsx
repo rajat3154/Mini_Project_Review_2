@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -19,7 +19,11 @@ const Login = () => {
     password: "",
     role: "",
   });
+
   const { loading } = useSelector((store) => store.auth);
+  useEffect(() => {
+    dispatch(setLoading(false)); // Reset loading on mount
+  }, []);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

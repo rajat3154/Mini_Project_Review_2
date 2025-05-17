@@ -15,7 +15,7 @@ router.route("/student/profile/update").post(isAuthenticated, singleUpload, upda
 router.route('/student/students').get(getAllStudents);
 router.delete("/students/:id", isAuthenticated, isaAdmin,deleteStudent);
 
-router.route("/recruiter/signup").post(recregister);
+router.route("/recruiter/signup").post(singleUpload, recregister);
 router.route("/recruiter/recruiters").get(getAllRecruiters);
 router.delete("/recruiter/:id", isAuthenticated, isaAdmin, deleteRecruiter);
 

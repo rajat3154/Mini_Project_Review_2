@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
+import { Check, X } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import Navbar from "./shared/Navbar";
 import {
   ADMIN_API_END_POINT,
   RECRUITER_API_END_POINT,
   STUDENT_API_END_POINT,
 } from "@/utils/constant";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Admin = () => {
   const [students, setStudents] = useState([]);
@@ -238,10 +240,13 @@ const Admin = () => {
       return;
 
     try {
-      const response = await fetch(`${STUDENT_API_END_POINT}/students/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/v1/students/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 
@@ -249,7 +254,6 @@ const Admin = () => {
         throw new Error(data.message || "Failed to delete student");
       }
 
-      // Remove the deleted student from state
       setStudents((prev) => prev.filter((s) => s._id !== id));
       toast.success(data.message || "Student deleted successfully");
     } catch (error) {
@@ -264,7 +268,7 @@ const Admin = () => {
 
     try {
       const response = await fetch(
-        `${RECRUITER_API_END_POINT}/recruiters/${id}`,
+        `http://localhost:8000/api/v1/recruiter/${id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -277,7 +281,6 @@ const Admin = () => {
         throw new Error(data.message || "Failed to delete recruiter");
       }
 
-      // Remove the deleted student from state
       setRecruiters((prev) => prev.filter((s) => s._id !== id));
       toast.success(data.message || "Recruiter deleted successfully");
     } catch (error) {
@@ -286,10 +289,12 @@ const Admin = () => {
     }
   };
 
+  // Helper function to get initials for avatar fallback
   const getInitials = (name) => {
+    if (!name) return "U";
     return name
-      ?.split(" ")
-      .map((part) => part[0])
+      .split(" ")
+      .map((n) => n[0])
       .join("")
       .toUpperCase();
   };
@@ -340,7 +345,7 @@ const Admin = () => {
             </div>
           ) : (
             <>
-              <div className="rounded-lg overflow-x-auto border border-gray-700 max-h-96 overflow-y-auto">
+              <div className="rounded-lg overflow-x-auto border border-gray-700 max-h-107 overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-700">
                   <thead className="bg-gray-800 sticky top-0">
                     <tr>
@@ -372,11 +377,9 @@ const Admin = () => {
                       currentStudents.map((student) => (
                         <tr key={student._id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <Avatar>
+                            <Avatar className="w-10 h-10">
                               <AvatarImage
-                                src={student?.profile?.profilePhoto}
-                                alt={student.fullname}
-                                className="h-10 w-10 rounded-full"
+                                src={student.profile?.profilePhoto}
                               />
                               <AvatarFallback>
                                 {getInitials(student.fullname)}
@@ -508,10 +511,13 @@ const Admin = () => {
             </div>
           ) : (
             <>
-              <div className="rounded-lg overflow-x-auto border border-gray-700 max-h-96 overflow-y-auto">
+              <div className="rounded-lg overflow-x-auto border border-gray-700 max-h-105 overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-700">
                   <thead className="bg-gray-800 sticky top-0">
                     <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        Logo
+                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                         Company
                       </th>
@@ -524,9 +530,7 @@ const Admin = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                         Address
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                        Status
-                      </th>
+                      
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                         Actions
                       </th>
@@ -536,6 +540,14 @@ const Admin = () => {
                     {currentRecruiters.length > 0 ? (
                       currentRecruiters.map((rec) => (
                         <tr key={rec._id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage src={rec.profile?.profilePhoto} />
+                              <AvatarFallback>
+                                {getInitials(rec.companyname)}
+                              </AvatarFallback>
+                            </Avatar>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {rec.companyname}
                           </td>
@@ -548,19 +560,10 @@ const Admin = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             {rec.companyaddress}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`px-2 py-1 rounded text-xs ${
-                                rec.companystatus === "Approved"
-                                  ? "bg-green-500"
-                                  : rec.companystatus === "Pending"
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
-                              }`}
-                            >
-                              {rec.companystatus}
-                            </span>
-                          </td>
+                         
+                             
+                            
+      
                           <td className="px-6 py-4 whitespace-nowrap">
                             <button
                               onClick={() => handleDeleteRecruiter(rec._id)}
@@ -573,7 +576,7 @@ const Admin = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6" className="px-6 py-4 text-center">
+                        <td colSpan="7" className="px-6 py-4 text-center">
                           {recruiters.length === 0
                             ? "No recruiters found"
                             : "No matching recruiters found"}
@@ -634,66 +637,43 @@ const Admin = () => {
             </div>
           ) : recruiterRequests.length > 0 ? (
             recruiterRequests.map((req) => (
-              <div key={req._id} className="bg-gray-800 p-4 rounded-lg mb-4">
-                <div className="flex items-center gap-4 mb-3">
-                  <Avatar>
-                    <AvatarImage
-                      src={req?.profilePhoto}
-                      alt={req.companyname}
-                      className="h-12 w-12 rounded-full"
-                    />
-                    <AvatarFallback>
-                      {getInitials(req.companyname)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-bold text-lg">{req.companyname}</h3>
-                    <p className="text-gray-400">{req.email}</p>
+              <div
+                key={req._id}
+                className="bg-gray-800 p-4 rounded-lg mb-4 text-white flex items-start gap-4"
+              >
+                <Avatar className="w-16 h-16 border border-gray-600">
+                  <AvatarImage src={req.profile?.profilePhoto} />
+                  <AvatarFallback>
+                    {getInitials(req.companyname)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p>
+                    <strong>Company:</strong> {req.companyname}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {req.email}
+                  </p>
+                  <p>
+                    <strong>CIN:</strong> {req.cinnumber}
+                  </p>
+                  <p>
+                    <strong>Address:</strong> {req.companyaddress}
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => handleApprove(req._id)}
+                      className="flex items-center gap-1 bg-green-500 hover:bg-green-600 px-4 py-1 rounded transition-colors"
+                    >
+                      <Check size={16} /> Accept
+                    </button>
+                    <button
+                      onClick={() => handleReject(req._id)}
+                      className="flex items-center gap-1 bg-red-500 hover:bg-red-600 px-4 py-1 rounded transition-colors"
+                    >
+                      <X size={16} /> Reject
+                    </button>
                   </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p>
-                      <strong>CIN:</strong> {req.cinnumber}
-                    </p>
-                    <p>
-                      <strong>Address:</strong> {req.companyaddress}
-                    </p>
-                  </div>
-                  <div>
-                    <p>
-                      <strong>Status:</strong>{" "}
-                      <span
-                        className={`px-2 py-1 rounded text-xs ${
-                          req.companystatus === "Approved"
-                            ? "bg-green-500"
-                            : req.companystatus === "Pending"
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                        }`}
-                      >
-                        {req.companystatus}
-                      </span>
-                    </p>
-                    <p>
-                      <strong>Request Date:</strong>{" "}
-                      {new Date(req.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <button
-                    onClick={() => handleApprove(req._id)}
-                    className="bg-green-500 hover:bg-green-600 px-4 py-1 rounded transition-colors"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => handleReject(req._id)}
-                    className="bg-red-500 hover:bg-red-600 px-4 py-1 rounded transition-colors"
-                  >
-                    Reject
-                  </button>
                 </div>
               </div>
             ))

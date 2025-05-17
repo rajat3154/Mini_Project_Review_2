@@ -21,16 +21,16 @@ const InternshipDetails = () => {
     skills: ["JavaScript", "React", "Node.js", "MongoDB"],
     applicants: [
       {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        status: "Pending Review",
+        name: "Aditi Somvanshi",
+        email: "aditisomvanshi100@gmail.com",
+        status: "Accepted",
         resumeUrl: "https://example.com/resume-john.pdf",
         appliedDate: "2025-04-01T12:00:00Z",
       },
       {
-        name: "Jane Smith",
-        email: "jane.smith@example.com",
-        status: "Reviewed",
+        name: "Saurabh Salve",
+        email: "saurabhsalve@gmail.com",
+        status: "Pending",
         resumeUrl: "https://example.com/resume-jane.pdf",
         appliedDate: "2025-04-02T15:30:00Z",
       },

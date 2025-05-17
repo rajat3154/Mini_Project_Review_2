@@ -17,7 +17,7 @@ export const sregister = async (req, res) => {
             }
             if (!req.file) {
                   return res.status(400).json({
-                        message: "Resume file is required",
+                        message: "Profile photo is required",
                         success: false
                   });
             }
@@ -173,6 +173,7 @@ export const login = async (req, res) => {
                               cinnumber: user.cinnumber,
                               role: user.role,
                               status: user.status,
+                              profile: user.profile,
                         };
 
             const welcomeMessage =
